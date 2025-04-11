@@ -40,18 +40,15 @@ st.set_page_config(layout="wide", page_icon="❤️")
 # 打印加载的特征列表，便于调试
 st.write(f"Loaded features from the model: {features}")
 
+# 正确的特征顺序
+ordered_features = [
+    'CT-lesion involving ascending aorta', 'NEU', 'Age', 'CT-peritoneal effusion', 'AST', 
+    'CREA', 'Escape beat', 'DBP', 'CT-intramural hematoma'
+]
+
 # 定义连续特征和分类特征
-continuous_features = [
-    'NEU', 'Age', 'AST', 'CREA', 'DBP'
-]
-
-categorical_features = [
-    'CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 
-    'Escape beat', 'CT-intramural hematoma'
-]
-
-# 将特征列表按顺序排列
-ordered_features = continuous_features + categorical_features
+continuous_features = ['NEU', 'Age', 'AST', 'CREA', 'DBP']
+categorical_features = ['CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 'Escape beat', 'CT-intramural hematoma']
 
 # 输入面板
 with st.sidebar:
