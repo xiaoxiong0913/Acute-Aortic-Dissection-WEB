@@ -18,8 +18,8 @@ for pkg in required_packages:
     install(pkg)
 
 # 加载模型和标准化器
-model_path = r"D:\WEB汇总\Acute Aortic Dissection WEB\gbm_model.pkl"
-scaler_path = r"D:\WEB汇总\Acute Aortic Dissection WEB\scaler.pkl"
+model_path = r"gbm_model.pkl"
+scaler_path = r"scaler.pkl"
 
 model = joblib.load(model_path)
 scaler = joblib.load(scaler_path)
