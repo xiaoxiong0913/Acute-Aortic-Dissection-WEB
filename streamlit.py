@@ -79,7 +79,7 @@ st.write("""
 st.write("# Introduction")
 st.write("""
 This clinical decision support tool integrates CT radiomics, electrocardiographic biomarkers, and laboratory parameters 
-to predict 3-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.09% accuracy**.
+to predict 1-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.05% accuracy**.
 """)
 
 # Clinical pathway cards
@@ -181,10 +181,10 @@ if submitted:
         color = "#dc3545" if risk_status == "High Risk" else "#28a745"
 
         # Display results
-        st.write(f"""
+        st.markdown(f"""
         <div class='result-card'>
             <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
-            <p>High risk of mortality within 3 years.</p>
+            <p>High risk of mortality within 1 year.</p>
             
             <h4>Parameter Assessment</h4>
             <ul>
