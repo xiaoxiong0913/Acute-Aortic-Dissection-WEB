@@ -38,12 +38,20 @@ except Exception as e:
 st.set_page_config(layout="wide", page_icon="❤️")
 st.title("Aortic Dissection Mortality Prediction System")
 
-# Introduction section
+# Introduction section with uniform font size
 st.markdown("""
+<style>
+.intro-text {
+    font-size: 16px;
+}
+</style>
+
+<div class='intro-text'>
 ## Introduction
 This clinical decision support tool integrates CT radiomics, electrocardiographic biomarkers, and laboratory parameters 
-to predict 3-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.09% accuracy**.
-""")
+to predict 3-year mortality risk in aortic dissection patients. Validated with <b>AUC 0.89 (0.84-0.94)</b> and <b>88.09% accuracy</b>.
+</div>
+""", unsafe_allow_html=True)
 
 # Load model resources
 try:
@@ -125,7 +133,30 @@ if submitted:
                 </div>
                 """, unsafe_allow_html=True)
                 
-            st.markdown("</div>", unsafe_allow_html=True)  # Close high-risk block
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        # Clinical Pathway Protocol
+        st.markdown("---")
+        st.markdown("""  
+        **Clinical Pathway Protocol**  
+        1. **High Risk Criteria**:  
+           - Probability ≥20.2%  
+           - Any aortic lesion/hematoma  
+           - Requires ICU admission  
+
+        2. **Surgical Indications**:  
+           - Ascending aorta involvement → Emergency surgery  
+           - Rapid hematoma expansion → Endovascular repair  
+
+        3. **Laboratory Alert Levels**:  
+           - Creatinine >200 μmol/L → Renal consult  
+           - AST >3×ULN → Hepatic workup  
+
+        4. **Monitoring Protocol**:  
+           - Hourly vital signs  
+           - 4-hourly neurovascular checks  
+           - Daily CT for first 72hrs  
+        """)
 
         # Standard recommendations
         st.markdown("""
@@ -140,5 +171,5 @@ if submitted:
 
 # Footer
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: gray;'>Developed by Yichang Central Hospital Cardiovascular Surgery Department</div>", 
+st.markdown("<div style='text-align: center; color: gray;'>Developed by Yichang Central People's Hospital</div>", 
             unsafe_allow_html=True)
