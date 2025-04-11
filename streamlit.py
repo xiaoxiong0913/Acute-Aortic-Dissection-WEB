@@ -163,6 +163,7 @@ with st.sidebar:
         submitted = st.form_submit_button("Predict Risk")
 
 # 预测处理
+# 预测处理部分
 if submitted:
     try:
         # 数据预处理
@@ -173,34 +174,34 @@ if submitted:
         risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
         color = "#dc3545" if risk_status == "High Risk" else "#28a745"
 
-        # 显示结果
+        # 使用 st.markdown 渲染 HTML
         st.markdown(f"""
-<div class='result-card'>
-    <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
-    <p>High risk of mortality within 1 year.</p>
+        <div class='result-card'>
+            <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
+            <p>High risk of mortality within 1 year.</p>
 
-    <h4>📊 Parameter Assessment</h4>
-    <ul>
-        <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
-            {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}</span></li>
-        <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>120 else "inherit"}'>
-            {input_data['AST']} {"⚠️" if input_data['AST']>120 else ""}</span></li>
-        <li>DBP (mmHg): {input_data['DBP']}</li>
-    </ul>
+            <h4>📊 Parameter Assessment</h4>
+            <ul>
+                <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
+                    {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}</span></li>
+                <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>120 else "inherit"}'>
+                    {input_data['AST']} {"⚠️" if input_data['AST']>120 else ""}</span></li>
+                <li>DBP (mmHg): {input_data['DBP']}</li>
+            </ul>
 
-    <h4>📝 Recommendations</h4>
-    <div style='padding-left:20px'>
-        <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
-        <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
-        {"<p style='color:#dc3545;'>• Immediate surgical consultation</p>" if risk_status == "High Risk" else ""}
-    </div>
-</div>
-""", unsafe_allow_html=True)
+            <h4>📝 Recommendations</h4>
+            <div style='padding-left:20px'>
+                <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
+                <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
+                {"<p style='color:#dc3545;'>• Immediate surgical consultation</p>" if risk_status == "High Risk" else ""}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
 
-# 个性化建议
+# 个性化建议部分
 st.markdown(
     "<span style='color:red'>This patient has a high probability of death within one year.</span>",
     unsafe_allow_html=True)
@@ -232,3 +233,4 @@ for feature, (normal_min, normal_max) in normal_ranges.items():
 st.write("---")
 st.write("<div style='text-align: center; color: gray;'>Developed by Yichang Central People's Hospital</div>", 
          unsafe_allow_html=True)
+
