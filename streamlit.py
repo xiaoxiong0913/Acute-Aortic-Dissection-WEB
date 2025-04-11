@@ -1,28 +1,42 @@
 import streamlit as st
 import pandas as pd
-import joblib
+import pickle
 import warnings
 import subprocess
 import sys
+from sklearn.preprocessing import StandardScaler
 
-# 配置警告信息
-warnings.filterwarnings("ignore", category=UserWarning)
+# 处理版本警告
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
-# 定义安装依赖函数
+
+# 安装所需包函数
 def install(package):
-    subprocess.run([sys.executable, "-m", "pip", "install", package, "-i", "https://pypi.tuna.tsinghua.edu.cn/simple"])
+    result = subprocess.run(
+        [sys.executable, "-m", "pip", "install", package, "-i", "https://pypi.tuna.tsinghua.edu.cn/simple"], check=True)
+    if result.returncode == 0:
+        print(f"{package} successfully installed.")
+    else:
+        print(f"Failed to install {package}.")
 
-# 安装必要依赖
-required_packages = ['streamlit', 'pandas', 'scikit-learn', 'joblib']
-for pkg in required_packages:
-    install(pkg)
+
+# 列出所有需要安装的包
+packages = ['pip', 'streamlit', 'pandas', 'scikit-learn', 'joblib']
+for package in packages:
+    install(package)
 
 # 加载模型和标准化器
 model_path = r"gbm_model.pkl"
 scaler_path = r"scaler.pkl"
 
-model = joblib.load(model_path)
-scaler = joblib.load(scaler_path)
+# 使用joblib加载模型和标准化器
+try:
+    with open(model_path, 'rb') as model_file, open(scaler_path, 'rb') as scaler_file:
+        model = pickle.load(model_file)
+        scaler = pickle.load(scaler_file)
+except Exception as e:
+    st.error(f"Error loading the model or scaler: {e}")
+    raise
 
 # 严格匹配训练时的特征名称和顺序（必须与训练数据完全一致）
 original_features = [
@@ -62,7 +76,7 @@ with st.sidebar:
         ct_effusion = st.selectbox(display_mapping['CT-peritoneal effusion'], ['No', 'Yes'])
         escape_beat = st.selectbox(display_mapping['Escape beat'], ['No', 'Yes'])
         ct_hematoma = st.selectbox(display_mapping['CT-intramural hematoma'], ['No', 'Yes'])
-        
+
         # 连续特征（带单位显示）
         neu = st.slider(display_mapping['NEU'], 0.0, 30.0, 5.0)
         age = st.slider(display_mapping['Age'], 18, 100, 60)
@@ -77,12 +91,12 @@ col1, col2 = st.columns([1, 2])
 
 with col1:
     st.markdown("## Aortic Dissection Mortality Predictor")
-    st.markdown("""
+    st.markdown(""" 
     **Multimodal Model Integrating:**
     - CT Radiomics Features
     - Electrocardiographic Biomarkers
     - Clinical Laboratory Data
-    
+
     **Validation Metrics:**
     - AUC: 0.89 (0.84-0.94)
     - Accuracy: 88.05%
@@ -105,26 +119,26 @@ with col2:
                 'DBP': dbp,
                 'CT-intramural hematoma': 1 if ct_hematoma == 'Yes' else 0
             }
-            
+
             # 创建严格排序的DataFrame
             df = pd.DataFrame([input_data], columns=original_features)
-            
+
             # 标准化处理
             scaled_data = scaler.transform(df)
-            
+
             # 预测概率
             prob = model.predict_proba(scaled_data)[0][1]
             risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
-            
+
             # 显示结果
             st.markdown(f"""
             ### Prediction Result: <span style='color:red'>{risk_status}</span>
-            ##### 1-Year Mortality Probability: {prob*100:.1f}%
+            ##### 1-Year Mortality Probability: {prob * 100:.1f}%
             """, unsafe_allow_html=True)
-            
+
             # 医学建议系统
             st.markdown("### Clinical Decision Support")
-            
+
             # 实验室异常检测
             lab_ranges = {
                 'NEU': (2.0, 7.5),
@@ -132,7 +146,7 @@ with col2:
                 'CREA': (64, 104),
                 'DBP': (60, 80)
             }
-            
+
             for param in lab_ranges:
                 value = input_data[param]
                 low, high = lab_ranges[param]
@@ -160,7 +174,7 @@ with col2:
                     }}[param]
                     </div>
                     """, unsafe_allow_html=True)
-            
+
             # 影像学危急值处理
             if ct_lesion == 'Yes':
                 st.markdown("""
@@ -172,7 +186,7 @@ with col2:
                 3. Monitor for rupture signs  
                 </div>
                 """, unsafe_allow_html=True)
-                
+
             if ct_hematoma == 'Yes':
                 st.markdown("""
                 <div style='background-color:#dc3545; color:white; padding:10px; border-radius:5px; margin:10px 0;'>
@@ -183,7 +197,7 @@ with col2:
                 3. Assess organ perfusion  
                 </div>
                 """, unsafe_allow_html=True)
-                
+
         except Exception as e:
             st.error(f"System Error: {str(e)}")
 
@@ -195,15 +209,15 @@ st.markdown("""
    - Probability ≥20.2%  
    - Any aortic lesion/hematoma  
    - Requires ICU admission  
-   
+
 2. **Surgical Indications**:  
    - Ascending aorta involvement → Emergency surgery  
    - Rapid hematoma expansion → Endovascular repair  
-   
+
 3. **Laboratory Alert Levels**:  
    - Creatinine >200 μmol/L → Renal consult  
    - AST >3×ULN → Hepatic workup  
-   
+
 4. **Monitoring Protocol**:  
    - Hourly vital signs  
    - 4-hourly neurovascular checks  
