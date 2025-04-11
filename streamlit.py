@@ -2,13 +2,10 @@ import streamlit as st
 import pandas as pd
 import pickle
 import os
-from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 # 处理版本警告
 import warnings
-
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # 加载模型、标准化器和特征列表
@@ -44,16 +41,21 @@ st.write(f"Loaded features from the model: {features}")
 
 # 正确的特征顺序
 ordered_features = [
-    'CT-lesion involving ascending aorta', 'NEU', 'Age', 'CT-peritoneal effusion', 'AST', 
-    'CREA', 'Escape beat', 'DBP', 'CT-intramural hematoma'
+    'CT-lesion involving ascending aorta', 'NEU', 'Age', 'CT-peritoneal effusion',
+    'AST', 'CREA', 'Escape beat', 'DBP', 'CT-intramural hematoma'
 ]
 
 # 定义连续特征和分类特征
 continuous_features = ['NEU', 'Age', 'AST', 'CREA', 'DBP']
-categorical_features = ['CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 'Escape beat', 'CT-intramural hematoma']
+categorical_features = [
+    'CT-lesion involving ascending aorta',
+    'CT-peritoneal effusion',
+    'Escape beat',
+    'CT-intramural hematoma'
+]
 
-# OneHotEncoder to transform categorical features
-onehot_encoder = OneHotEncoder()  # Removed the sparse=False argument
+# OneHotEncoder to transform categorical features (returns a sparse matrix by default)
+onehot_encoder = OneHotEncoder()
 
 # 输入面板
 with st.sidebar:
@@ -116,13 +118,13 @@ with col2:
             # 打印输入数据（用于调试）
             st.write(f"Input data: {input_data}")
 
-            # 将分类变量转化为 one-hot 编码
+            # 将分类变量转化为 one-hot 编码（转换为 Dense array）
             categorical_data = [input_data[feature] for feature in categorical_features]
-            categorical_data_onehot = onehot_encoder.fit_transform([categorical_data])
+            categorical_data_onehot_dense = onehot_encoder.fit_transform([categorical_data]).toarray()
 
             # 将数值数据和编码后的分类数据合并
             continuous_data = [input_data[feature] for feature in continuous_features]
-            input_data_all = continuous_data + categorical_data_onehot[0].tolist()
+            input_data_all = continuous_data + categorical_data_onehot_dense[0].tolist()
 
             # 创建严格排序的DataFrame
             df = pd.DataFrame([input_data_all], columns=ordered_features)
@@ -221,3 +223,13 @@ st.markdown("""
    - 4-hourly neurovascular checks  
    - Daily CT for first 72hrs  
 """)
+
+---
+
+### Explanation
+
+1. We **convert** the sparse matrix returned by `OneHotEncoder` into a **dense NumPy array** using `.toarray()`.  
+2. Then we use `[0]` to grab the row from that 2D array (since we only encoded one sample).  
+3. Finally, `.tolist()` converts that row into a standard Python list so it can be concatenated with the list of continuous features.
+
+This approach resolves the `'csr_matrix' object has no attribute 'tolist'` error.
