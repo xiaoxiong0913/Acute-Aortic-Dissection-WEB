@@ -10,9 +10,9 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # 加载模型、标准化器和特征列表
-model_path = r"E:\中心实验室\XWY\CT和ECG\结果文件夹\WEB\gbm_model.pkl"
-scaler_path = r"E:\中心实验室\XWY\CT和ECG\结果文件夹\WEB\scaler.pkl"
-features_path = r"E:\中心实验室\XWY\CT和ECG\结果文件夹\WEB\features.txt"
+model_path = r"gbm_model.pkl"
+scaler_path = r"scaler.pkl"
+features_path = r"features.txt"
 
 # 使用 pickle 加载模型和标准化器
 try:
