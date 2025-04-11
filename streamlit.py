@@ -128,7 +128,6 @@ st.write("Personalized Recommendations:")
 
 # 假设的正常范围
 normal_ranges = {
-    'Age': (18, 100),
     'NEU': (0.1, 25.0),
     'AST': (0, 120),
     'CREA': (30, 200),
