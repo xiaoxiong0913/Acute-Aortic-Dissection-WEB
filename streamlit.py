@@ -1,19 +1,3 @@
-import streamlit as st
-import pandas as pd
-import pickle
-import os
-from sklearn.preprocessing import StandardScaler
-
-# 处理版本警告
-import warnings
-
-warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
-
-# 加载模型、标准化器和特征列表
-model_path = r"gbm_model.pkl"
-scaler_path = r"scaler.pkl"
-features_path = r"features.txt"
-
 # 使用 pickle 加载模型和标准化器
 try:
     with open(model_path, 'rb') as model_file:
@@ -36,19 +20,44 @@ except Exception as e:
 # 页面布局
 st.set_page_config(layout="wide", page_icon="❤️")
 
+# 定义连续特征和分类特征
+continuous_features = [
+    'NEU', 'Age', 'AST', 'CREA', 'DBP'
+]
+
+categorical_features = [
+    'CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 
+    'Escape beat', 'CT-intramural hematoma'
+]
+
+# 将特征列表按顺序排列
+ordered_features = continuous_features + categorical_features
+
 # 输入面板
 with st.sidebar:
     st.markdown("## Patient Parameters")
     with st.form("input_form"):
         # 动态生成输入选项（基于上传的特征列表）
         inputs = {}
-        for feature in features:
-            if feature in ['CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 'Escape beat',
-                           'CT-intramural hematoma']:
-                inputs[feature] = st.selectbox(feature, ['No', 'Yes'])
-            else:
-                inputs[feature] = st.slider(feature, min_value=0, max_value=100, value=50)
 
+        # 处理连续变量并为其加上单位
+        for feature in continuous_features:
+            if feature == 'Age':
+                inputs[feature] = st.slider(f'{feature} (Years)', min_value=18, max_value=100, value=50)
+            elif feature == 'NEU':
+                inputs[feature] = st.slider(f'{feature} (10^9/L)', min_value=0.1, max_value=20.0, value=5.0)
+            elif feature == 'AST':
+                inputs[feature] = st.slider(f'{feature} (U/L)', min_value=0, max_value=500, value=30)
+            elif feature == 'CREA':
+                inputs[feature] = st.slider(f'{feature} (μmol/L)', min_value=30, max_value=200, value=80)
+            elif feature == 'DBP':
+                inputs[feature] = st.slider(f'{feature} (mmHg)', min_value=40, max_value=120, value=80)
+
+        # 处理分类变量
+        for feature in categorical_features:
+            inputs[feature] = st.selectbox(feature, ['No', 'Yes'])
+
+        # 提交按钮
         submitted = st.form_submit_button("Predict Risk")
 
 # 结果面板
@@ -83,7 +92,7 @@ with col2:
                     input_data[feature] = inputs[feature]
 
             # 创建严格排序的DataFrame
-            df = pd.DataFrame([input_data], columns=features)
+            df = pd.DataFrame([input_data], columns=ordered_features)
 
             # 标准化处理
             df_scaled = scaler.transform(df)
