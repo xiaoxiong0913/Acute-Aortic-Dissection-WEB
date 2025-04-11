@@ -49,6 +49,9 @@ categorical_features = [
 # 将特征列表按顺序排列
 ordered_features = continuous_features + categorical_features
 
+# 加载 LabelEncoder（确保分类特征匹配）
+label_encoders = {feature: LabelEncoder() for feature in categorical_features}
+
 # 输入面板
 with st.sidebar:
     st.markdown("## Patient Parameters")
@@ -106,6 +109,10 @@ with col2:
                     input_data[feature] = 0
                 else:
                     input_data[feature] = inputs[feature]
+
+            # 对分类变量进行编码，确保与训练时一致
+            for feature in categorical_features:
+                input_data[feature] = label_encoders[feature].fit_transform([input_data[feature]])[0]
 
             # 创建严格排序的DataFrame
             df = pd.DataFrame([input_data], columns=ordered_features)
