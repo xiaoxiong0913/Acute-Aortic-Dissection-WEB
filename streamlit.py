@@ -53,7 +53,7 @@ continuous_features = ['NEU', 'Age', 'AST', 'CREA', 'DBP']
 categorical_features = ['CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 'Escape beat', 'CT-intramural hematoma']
 
 # OneHotEncoder to transform categorical features
-onehot_encoder = OneHotEncoder(sparse=False)
+onehot_encoder = OneHotEncoder()  # Removed the sparse=False argument
 
 # 输入面板
 with st.sidebar:
