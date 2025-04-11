@@ -121,12 +121,11 @@ with col2:
             df_scaled = scaler.transform(df)
 
             # 预测概率
-            prob = model.predict_proba(df_scaled)[:, 1]
-            risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
+            prob = model.predict_proba(df_scaled)[:, 1][0]  # 获取类别为1的预测概率
 
             # 显示结果
             st.markdown(f"""
-            ### Prediction Result: <span style='color:red'>{risk_status}</span>
+            ### Prediction Result: <span style='color:red'>{'High Risk' if prob >= 0.202 else 'Low Risk'}</span>
             ##### 1-Year Mortality Probability: {prob * 100:.1f}%
             """, unsafe_allow_html=True)
 
