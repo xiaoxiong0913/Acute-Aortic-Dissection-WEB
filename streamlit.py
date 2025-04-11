@@ -24,26 +24,26 @@ scaler_path = r"scaler.pkl"
 model = joblib.load(model_path)
 scaler = joblib.load(scaler_path)
 
-# 原始特征名称（必须与训练时完全一致）
+# 确保与训练时完全一致的特征名称（不要修改）
 original_features = [
-    'NEU',  # 中性粒细胞计数
+    'CT-lesion involving ascending aorta',
+    'NEU', 
     'Age',
+    'CT-peritoneal effusion',
     'AST',
     'CREA',
-    'DBP',
-    'CT-lesion involving ascending aorta',
-    'CT-peritoneal effusion',
     'Escape beat',
+    'DBP',
     'CT-intramural hematoma'
 ]
 
-# 带单位的显示名称
-display_names = {
+# 带单位的显示名称映射
+display_mapping = {
     'NEU': 'Neutrophil Count (10⁹/L)',
     'Age': 'Age (years)',
-    'AST': 'Aspartate Aminotransferase (U/L)',
+    'AST': 'AST (U/L)',
     'CREA': 'Creatinine (μmol/L)',
-    'DBP': 'Diastolic Blood Pressure (mmHg)',
+    'DBP': 'Diastolic BP (mmHg)',
     'CT-lesion involving ascending aorta': 'CT: Ascending Aorta Lesion',
     'CT-peritoneal effusion': 'CT: Peritoneal Effusion',
     'Escape beat': 'ECG: Escape Beat',
@@ -52,10 +52,10 @@ display_names = {
 
 # 国际标准正常范围
 normal_ranges = {
-    'NEU': (2.0, 7.5),
-    'AST': (0, 40),
-    'CREA': (44, 115),
-    'DBP': (60, 80)
+    'NEU': (2.0, 7.5),    # 中性粒细胞
+    'AST': (8, 40),       # 天门冬氨酸氨基转移酶
+    'CREA': (64, 104),    # 肌酐（男性）
+    'DBP': (60, 80)       # 舒张压
 }
 
 # ================= 页面布局 =================
@@ -65,18 +65,18 @@ st.set_page_config(layout="wide")
 with st.sidebar:
     st.markdown("## Patient Parameters")
     with st.form("aortic_form"):
-        # 连续变量输入
-        neu = st.slider(display_names['NEU'], 0.0, 30.0, 5.0)
-        age = st.slider(display_names['Age'], 18, 100, 60)
-        ast = st.slider(display_names['AST'], 0, 500, 30)
-        crea = st.slider(display_names['CREA'], 30, 1000, 80)
-        dbp = st.slider(display_names['DBP'], 30, 150, 75)
+        # 连续变量
+        neu = st.slider(display_mapping['NEU'], 0.0, 30.0, 5.0)
+        age = st.slider(display_mapping['Age'], 18, 100, 60)
+        ast = st.slider(display_mapping['AST'], 0, 500, 30)
+        crea = st.slider(display_mapping['CREA'], 30, 1000, 80)
+        dbp = st.slider(display_mapping['DBP'], 30, 150, 75)
 
-        # 分类变量输入
-        ct_lesion = st.selectbox(display_names['CT-lesion involving ascending aorta'], ['No', 'Yes'])
-        ct_effusion = st.selectbox(display_names['CT-peritoneal effusion'], ['No', 'Yes'])
-        escape_beat = st.selectbox(display_names['Escape beat'], ['No', 'Yes'])
-        ct_hematoma = st.selectbox(display_names['CT-intramural hematoma'], ['No', 'Yes'])
+        # 分类变量
+        ct_lesion = st.selectbox(display_mapping['CT-lesion involving ascending aorta'], ['No', 'Yes'])
+        ct_effusion = st.selectbox(display_mapping['CT-peritoneal effusion'], ['No', 'Yes'])
+        escape_beat = st.selectbox(display_mapping['Escape beat'], ['No', 'Yes'])
+        ct_hematoma = st.selectbox(display_mapping['CT-intramural hematoma'], ['No', 'Yes'])
 
         submitted = st.form_submit_button("Predict Mortality Risk")
 
@@ -84,37 +84,38 @@ with st.sidebar:
 col1, col2 = st.columns([1, 3])
 
 with col1:
-    # 标题和介绍
-    st.title('Aortic Dissection Mortality Predictor')
+    st.title('Aortic Dissection Mortality Prediction')
     st.markdown("""
     ## Multimodal Predictive Model
     **Integrating CT Radiomics and ECG Biomarkers**
     
-    Model Performance:
-    - **AUC**: 0.89 (0.84-0.94)
-    - **Accuracy**: 88.05%
-    - **F1-score**: 0.65
+    ### Model Performance:
+    - **AUC**: 0.89 (95% CI: 0.84-0.94)
+    - **Accuracy**: 88.05%  
+    - **F1-score**: 0.65  
     - **Risk Threshold**: ≥0.202
     """)
 
 with col2:
     if submitted:
         try:
-            # 数据转换
+            # 构建与训练时完全一致的数据结构
             data = {
+                'CT-lesion involving ascending aorta': 1 if ct_lesion == 'Yes' else 0,
                 'NEU': neu,
                 'Age': age,
+                'CT-peritoneal effusion': 1 if ct_effusion == 'Yes' else 0,
                 'AST': ast,
                 'CREA': crea,
-                'DBP': dbp,
-                'CT-lesion involving ascending aorta': 1 if ct_lesion == 'Yes' else 0,
-                'CT-peritoneal effusion': 1 if ct_effusion == 'Yes' else 0,
                 'Escape beat': 1 if escape_beat == 'Yes' else 0,
+                'DBP': dbp,
                 'CT-intramural hematoma': 1 if ct_hematoma == 'Yes' else 0
             }
 
-            # 创建DataFrame并标准化
+            # 创建DataFrame（严格保持训练时的特征顺序）
             df = pd.DataFrame([data], columns=original_features)
+            
+            # 标准化处理
             scaled_data = scaler.transform(df)
 
             # 预测概率
@@ -125,66 +126,71 @@ with col2:
             st.markdown(f"## Prediction Result: **{risk_level}**")
             st.markdown(f"### 1-Year Mortality Probability: **{prob*100:.1f}%**")
 
-            # 异常值建议
+            # 实验室异常建议
             st.markdown("### Clinical Recommendations")
-            for feature in normal_ranges:
+            for feature in ['NEU', 'AST', 'CREA', 'DBP']:
                 value = data[feature]
                 min_val, max_val = normal_ranges[feature]
-                display_name = display_names[feature]
-
+                
                 if value < min_val:
                     st.markdown(f"""
                     <div style='background-color:#fff3cd; padding:10px; border-radius:5px; margin:10px 0;'>
-                    ⚠️ **{display_name}**: {value} (Below normal range {min_val}-{max_val})  
-                    Recommended Actions:  
-                    • Perform infection screening  
-                    • Evaluate bone marrow function
+                    ⚠️ **{display_mapping[feature]}**: {value}  
+                    *Below normal range ({min_val}-{max_val})*  
+                    Recommended actions:  
+                    {{
+                        'NEU': '• Infection screening\n• Bone marrow evaluation',
+                        'AST': '• Repeat liver function tests\n• Viral hepatitis panel',
+                        'CREA': '• Renal ultrasound\n• Urinalysis',
+                        'DBP': '• Volume status assessment\n• Cardiac evaluation'
+                    }}[feature]
                     </div>
                     """, unsafe_allow_html=True)
-
+                    
                 elif value > max_val:
                     st.markdown(f"""
                     <div style='background-color:#f8d7da; padding:10px; border-radius:5px; margin:10px 0;'>
-                    ⚠️ **{display_name}**: {value} (Above normal range {min_val}-{max_val})  
-                    Recommended Actions:  
-                    • {{
-                        'NEU': 'Initiate infection control protocol',
-                        'AST': 'Conduct hepatic function assessment',
-                        'CREA': 'Consult nephrology specialist',
-                        'DBP': 'Optimize antihypertensive therapy'
+                    ⚠️ **{display_mapping[feature]}**: {value}  
+                    *Above normal range ({min_val}-{max_val})*  
+                    Recommended actions:  
+                    {{
+                        'NEU': '• Infection control protocol\n• Consider sepsis workup',
+                        'AST': '• Hepatology consultation\n• Abdominal ultrasound',
+                        'CREA': '• Nephrology consultation\n• Stop nephrotoxic drugs',
+                        'DBP': '• Antihypertensive therapy adjustment\n• End-organ damage evaluation'
                     }}[feature]
                     </div>
                     """, unsafe_allow_html=True)
 
-            # 影像特征建议
+            # 影像学警报
             st.markdown("### Critical Imaging Findings")
             if ct_lesion == 'Yes':
                 st.error("""
-                **Ascending Aortic Involvement**  
-                Immediate Actions:  
-                1. Contact cardiothoracic surgery  
-                2. Prepare for possible emergency intervention  
-                3. Monitor for pericardial effusion
+                **Ascending Aorta Involvement**  
+                Immediate Actions Required:  
+                1. Emergency cardiothoracic surgery consult  
+                2. Bedside echocardiography  
+                3. Prepare operating room  
                 """)
                 
             if ct_hematoma == 'Yes':
                 st.error("""
-                **Intramural Hematoma Detected**  
-                Required Measures:  
-                1. Serial CT monitoring (24/48/72hrs)  
-                2. Strict blood pressure control  
-                3. Assess for end-organ malperfusion
+                **Intramural Hematoma**  
+                Monitoring Protocol:  
+                1. Serial CT angiography (24/48/72 hrs)  
+                2. Target SBP <120 mmHg  
+                3. Neurological assessment q4h  
                 """)
 
         except Exception as e:
             st.error(f"Prediction Error: {str(e)}")
 
-# 底部临床指南
+# 底部指南
 st.markdown("---")
 st.markdown("""
-**Clinical Protocol Guidance**  
-• High-risk patients require ICU admission  
-• Surgical consultation within 2hrs for ascending aorta involvement  
-• Renal protection protocol for creatinine >200 μmol/L  
-• MDT consultation for all positive imaging findings
+**Clinical Protocol**  
+1. High-risk patients: Immediate ICU transfer  
+2. Ascending aorta involvement: Surgical consult within 2 hours  
+3. Creatinine >200 μmol/L: Initiate renal protection protocol  
+4. All imaging abnormalities: Mandatory MDT review  
 """)
