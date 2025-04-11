@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import pickle
 import os
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
 # 处理版本警告
 import warnings
@@ -49,6 +51,9 @@ ordered_features = [
 # 定义连续特征和分类特征
 continuous_features = ['NEU', 'Age', 'AST', 'CREA', 'DBP']
 categorical_features = ['CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 'Escape beat', 'CT-intramural hematoma']
+
+# OneHotEncoder to transform categorical features
+onehot_encoder = OneHotEncoder(sparse=False, drop='if_binary')
 
 # 输入面板
 with st.sidebar:
@@ -111,8 +116,16 @@ with col2:
             # 打印输入数据（用于调试）
             st.write(f"Input data: {input_data}")
 
+            # 将分类变量转化为 one-hot 编码
+            categorical_data = [input_data[feature] for feature in categorical_features]
+            categorical_data_onehot = onehot_encoder.fit_transform([categorical_data])
+
+            # 将数值数据和编码后的分类数据合并
+            continuous_data = [input_data[feature] for feature in continuous_features]
+            input_data_all = continuous_data + categorical_data_onehot[0].tolist()
+
             # 创建严格排序的DataFrame
-            df = pd.DataFrame([input_data], columns=ordered_features)
+            df = pd.DataFrame([input_data_all], columns=ordered_features)
 
             # 打印 DataFrame 的列名（用于调试）
             st.write(f"Columns in the DataFrame: {df.columns.tolist()}")
