@@ -79,7 +79,7 @@ st.write("""
 st.write("# Introduction")
 st.write("""
 This clinical decision support tool integrates CT radiomics, electrocardiographic biomarkers, and laboratory parameters 
-to predict 3-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.09% accuracy**.
+to predict 3-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.05% accuracy**.
 """)
 
 # Clinical pathway cards
@@ -169,42 +169,38 @@ with st.sidebar:
         
         submitted = st.form_submit_button("Predict Risk")
 
-# Process prediction
-if submitted:
-    try:
-        # Preprocess data
-        input_data = {k: 1 if v == "Yes" else 0 if isinstance(v, str) else v for k, v in inputs.items()}
-        df = pd.DataFrame([input_data], columns=features)
-        df_scaled = scaler.transform(df)
-        prob = model.predict_proba(df_scaled)[:, 1][0]
-        risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
-        color = "#dc3545" if risk_status == "High Risk" else "#28a745"
+st.markdown(
+    "<span style='color:red'>This patient has a high probability of death within three years.</span>",
+    unsafe_allow_html=True)
+st.write("Personalized Recommendations:")
 
-        # Display results
-        st.write(f"""
-        <div class='result-card'>
-            <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
-            <p>High risk of mortality within 3 years.</p>
-            
-            <h4>📊 Parameter Assessment</h4>
-            <ul>
-                <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
-                    {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}
-                </span></li>
-                <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>120 else "inherit"}'>
-                    {input_data['AST']} {"⚠️" if input_data['AST']>120 else ""}
-                </span></li>
-                <li>DBP (mmHg): {input_data['DBP']}</li>
-            </ul>
-            
-            <h4>📝 Recommendations</h4>
-            <div style='padding-left:20px'>
-                <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
-                <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
-                {"<p style='color:#dc3545;'>• Immediate surgical consultation</p>" if risk_status == "High Risk" else ""}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+# 假设 normal_ranges 是每个特征的正常范围
+for feature, (normal_min, normal_max) in normal_ranges.items():
+    value = data[feature]  # 获取每个特征的值
+    if value < normal_min:
+        st.markdown(
+            f"<span style='color:red'>{feature}: Your value is {value}. It is lower than the normal range ({normal_min} - {normal_max}). Consider increasing it towards {normal_min}.</span>",
+            unsafe_allow_html=True)
+    elif value > normal_max:
+        st.markdown(
+            f"<span style='color:red'>{feature}: Your value is {value}. It is higher than the normal range ({normal_min} - {normal_max}). Consider decreasing it towards {normal_max}.</span>",
+            unsafe_allow_html=True)
+    else:
+        st.write(f"{feature}: Your value is within the normal range ({normal_min} - {normal_max}).")
+
+# 根据条件提供治疗建议
+if treatment_needed == 'Yes':
+    st.write("Immediate treatment is recommended for this patient.")
+
+if lifestyle_change == 'Yes':
+    st.write("Consider recommending lifestyle modifications.")
+
+# 如果患者状况较好
+if condition_good:
+    st.markdown(
+        "<span style='color:green'>This patient has a high probability of survival after three years.</span>",
+        unsafe_allow_html=True)
+
         
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
