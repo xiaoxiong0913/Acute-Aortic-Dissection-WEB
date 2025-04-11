@@ -223,13 +223,3 @@ st.markdown("""
    - 4-hourly neurovascular checks  
    - Daily CT for first 72hrs  
 """)
-
----
-
-### Explanation
-
-1. We **convert** the sparse matrix returned by `OneHotEncoder` into a **dense NumPy array** using `.toarray()`.  
-2. Then we use `[0]` to grab the row from that 2D array (since we only encoded one sample).  
-3. Finally, `.tolist()` converts that row into a standard Python list so it can be concatenated with the list of continuous features.
-
-This approach resolves the `'csr_matrix' object has no attribute 'tolist'` error.
