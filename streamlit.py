@@ -233,6 +233,4 @@ st.write("<div style='text-align: center; color: gray;'>Developed by Yichang Cen
     <p style='color:#dc3545;'>• Immediate surgical consultation</p>
 </div>
 
-这部分在页面上是这么输出的太奇怪了，其次介绍中准确率是88.05%
 
-我是在streamlit上运行的，请你帮我把这些部分都改掉
