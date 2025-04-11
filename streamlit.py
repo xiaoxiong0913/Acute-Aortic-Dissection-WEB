@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import pickle
 import os
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 # 处理版本警告
 import warnings
@@ -10,9 +10,9 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 # 加载模型、标准化器和特征列表
-model_path = r"gbm_model.pkl"
-scaler_path = r"scaler.pkl"
-features_path = r"features.txt"
+model_path = r"E:\中心实验室\XWY\CT和ECG\结果文件夹\WEB\gbm_model.pkl"
+scaler_path = r"E:\中心实验室\XWY\CT和ECG\结果文件夹\WEB\scaler.pkl"
+features_path = r"E:\中心实验室\XWY\CT和ECG\结果文件夹\WEB\features.txt"
 
 # 使用 pickle 加载模型和标准化器
 try:
@@ -48,9 +48,6 @@ categorical_features = [
 
 # 将特征列表按顺序排列
 ordered_features = continuous_features + categorical_features
-
-# 加载 LabelEncoder（确保分类特征匹配）
-label_encoders = {feature: LabelEncoder() for feature in categorical_features}
 
 # 输入面板
 with st.sidebar:
@@ -110,7 +107,9 @@ with col2:
                 else:
                     input_data[feature] = inputs[feature]
 
-            # 对分类变量进行编码，确保与训练时一致
+            # 实例化 LabelEncoder 对象，并对分类特征进行编码
+            label_encoders = {feature: LabelEncoder() for feature in categorical_features}
+            
             for feature in categorical_features:
                 input_data[feature] = label_encoders[feature].fit_transform([input_data[feature]])[0]
 
