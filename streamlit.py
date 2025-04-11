@@ -68,11 +68,11 @@ st.write("""
 </style>
 """, unsafe_allow_html=True)
 
-# 介绍部分
+# 介绍部分，修改为一年死亡率
 st.write("# Introduction")
 st.write("""
 This clinical decision support tool integrates CT radiomics, electrocardiographic biomarkers, and laboratory parameters 
-to predict 3-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.05% accuracy**.
+to predict 1-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.05% accuracy**.
 """)
 
 # 临床路径卡片
@@ -177,7 +177,7 @@ if submitted:
         st.write(f"""
         <div class='result-card'>
             <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
-            <p>High risk of mortality within 3 years.</p>
+            <p>High risk of mortality within 1 year.</p>
 
             <h4>📊 Parameter Assessment</h4>
             <ul>
@@ -202,13 +202,21 @@ if submitted:
 
 # 个性化建议
 st.markdown(
-    "<span style='color:red'>This patient has a high probability of death within three years.</span>",
+    "<span style='color:red'>This patient has a high probability of death within one year.</span>",
     unsafe_allow_html=True)
 st.write("Personalized Recommendations:")
 
-# 假设 normal_ranges 是每个特征的正常范围
+# 假设的正常范围
+normal_ranges = {
+    'Age': (18, 100),
+    'NEU': (0.1, 25.0),
+    'AST': (0, 120),
+    'CREA': (30, 200),
+    'DBP': (40, 120)
+}
+
 for feature, (normal_min, normal_max) in normal_ranges.items():
-    value = data[feature]  # 获取每个特征的值
+    value = inputs[feature]  # 获取每个特征的值
     if value < normal_min:
         st.markdown(
             f"<span style='color:red'>{feature}: Your value is {value}. It is lower than the normal range ({normal_min} - {normal_max}). Consider increasing it towards {normal_min}.</span>",
@@ -219,19 +227,6 @@ for feature, (normal_min, normal_max) in normal_ranges.items():
             unsafe_allow_html=True)
     else:
         st.write(f"{feature}: Your value is within the normal range ({normal_min} - {normal_max}).")
-
-# 根据条件提供治疗建议
-if treatment_needed == 'Yes':
-    st.write("Immediate treatment is recommended for this patient.")
-
-if lifestyle_change == 'Yes':
-    st.write("Consider recommending lifestyle modifications.")
-
-# 如果患者状况较好
-if condition_good:
-    st.markdown(
-        "<span style='color:green'>This patient has a high probability of survival after three years.</span>",
-        unsafe_allow_html=True)
 
 # Footer
 st.write("---")
