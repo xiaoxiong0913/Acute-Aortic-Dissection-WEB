@@ -1,3 +1,19 @@
+import streamlit as st
+import pandas as pd
+import pickle
+import os
+from sklearn.preprocessing import StandardScaler
+
+# 处理版本警告
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
+
+# 加载模型、标准化器和特征列表
+model_path = r"gbm_model.pkl"
+scaler_path = r"scaler.pkl"
+features_path = r"features.txt"
+
 # 使用 pickle 加载模型和标准化器
 try:
     with open(model_path, 'rb') as model_file:
