@@ -29,12 +29,16 @@ try:
     # 加载特征列表
     with open(features_path, 'r') as f:
         features = f.read().splitlines()
+
 except Exception as e:
     st.error(f"加载模型、标准化器或特征时发生错误: {e}")
     st.stop()
 
 # 页面布局
 st.set_page_config(layout="wide", page_icon="❤️")
+
+# 打印加载的特征列表，便于调试
+st.write(f"Loaded features from the model: {features}")
 
 # 定义连续特征和分类特征
 continuous_features = [
@@ -107,14 +111,14 @@ with col2:
                 else:
                     input_data[feature] = inputs[feature]
 
-            # 实例化 LabelEncoder 对象，并对分类特征进行编码
-            label_encoders = {feature: LabelEncoder() for feature in categorical_features}
-            
-            for feature in categorical_features:
-                input_data[feature] = label_encoders[feature].fit_transform([input_data[feature]])[0]
+            # 打印输入数据（用于调试）
+            st.write(f"Input data: {input_data}")
 
             # 创建严格排序的DataFrame
             df = pd.DataFrame([input_data], columns=ordered_features)
+
+            # 打印 DataFrame 的列名（用于调试）
+            st.write(f"Columns in the DataFrame: {df.columns.tolist()}")
 
             # 标准化处理
             df_scaled = scaler.transform(df)
