@@ -37,9 +37,6 @@ except Exception as e:
 # 页面布局
 st.set_page_config(layout="wide", page_icon="❤️")
 
-# 打印加载的特征列表，便于调试
-st.write(f"Loaded features from the model: {features}")
-
 # 正确的特征顺序
 ordered_features = [
     'CT-lesion involving ascending aorta', 'NEU', 'Age', 'CT-peritoneal effusion', 'AST', 
@@ -108,14 +105,8 @@ with col2:
                 else:
                     input_data[feature] = inputs[feature]
 
-            # 打印输入数据（用于调试）
-            st.write(f"Input data: {input_data}")
-
             # 创建严格排序的DataFrame
             df = pd.DataFrame([input_data], columns=ordered_features)
-
-            # 打印 DataFrame 的列名（用于调试）
-            st.write(f"Columns in the DataFrame: {df.columns.tolist()}")
 
             # 标准化处理
             df_scaled = scaler.transform(df)
