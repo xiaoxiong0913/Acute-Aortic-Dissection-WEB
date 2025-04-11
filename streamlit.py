@@ -87,7 +87,7 @@ cols = st.columns(3)
 with cols[0]:
     st.write("""
     <div class='protocol-card critical-card'>
-        <h4 style='color:#dc3545;'>🚨 High Risk Criteria</h4>
+        <h4 style='color:#dc3545;'>High Risk Criteria</h4>
         <ul style='padding-left:20px'>
             <li>Probability ≥20.2%</li>
             <li>Aortic lesion/hematoma</li>
@@ -96,7 +96,7 @@ with cols[0]:
     </div>
     
     <div class='protocol-card green-card'>
-        <h4 style='color:#28a745;'>🔬 Laboratory Alerts</h4>
+        <h4 style='color:#28a745;'>Laboratory Alerts</h4>
         <ul style='padding-left:20px'>
             <li>Creatinine >200 μmol/L → Renal consult</li>
             <li>AST >3×ULN → Hepatic workup</li>
@@ -107,7 +107,7 @@ with cols[0]:
 with cols[1]:
     st.write("""
     <div class='protocol-card warning-card'>
-        <h4 style='color:#dc3545;'>⚕️ Surgical Indications</h4>
+        <h4 style='color:#dc3545;'>Surgical Indications</h4>
         <ul style='padding-left:20px'>
             <li>Ascending aorta involvement → Emergency surgery</li>
             <li>Rapid hematoma expansion → Endovascular repair</li>
@@ -115,7 +115,7 @@ with cols[1]:
     </div>
     
     <div class='protocol-card green-card'>
-        <h4 style='color:#28a745;'>📋 Standard Protocol</h4>
+        <h4 style='color:#28a745;'>Standard Protocol</h4>
         <ul style='padding-left:20px'>
             <li>CT follow-up q72h</li>
             <li>BP target: SBP <120 mmHg</li>
@@ -127,7 +127,7 @@ with cols[1]:
 with cols[2]:
     st.write("""
     <div class='protocol-card green-card'>
-        <h4 style='color:#28a745;'>👁️ Monitoring Protocol</h4>
+        <h4 style='color:#28a745;'>Monitoring Protocol</h4>
         <ul style='padding-left:20px'>
             <li>Hourly vital signs</li>
             <li>Neuro checks q4h</li>
@@ -186,18 +186,16 @@ if submitted:
             <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
             <p>High risk of mortality within 3 years.</p>
             
-            <h4>📊 Parameter Assessment</h4>
+            <h4>Parameter Assessment</h4>
             <ul>
                 <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
-                    {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}
-                </span></li>
+                    {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}</span></li>
                 <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>120 else "inherit"}'>
-                    {input_data['AST']} {"⚠️" if input_data['AST']>120 else ""}
-                </span></li>
+                    {input_data['AST']} {"⚠️" if input_data['AST']>120 else ""}</span></li>
                 <li>DBP (mmHg): {input_data['DBP']}</li>
             </ul>
             
-            <h4>📝 Recommendations</h4>
+            <h4>Recommendations</h4>
             <div style='padding-left:20px'>
                 <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
                 <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
@@ -213,24 +211,3 @@ if submitted:
 st.write("---")
 st.write("<div style='text-align: center; color: gray;'>Developed by Yichang Central People's Hospital</div>", 
          unsafe_allow_html=True)
-
-
-<h4>📊 Parameter Assessment</h4>
-<ul>
-    <li>CREA (μmol/L): <span style='color:inherit'>
-        149 
-    </span></li>
-    <li>AST (U/L): <span style='color:#dc3545'>
-        346 ⚠️
-    </span></li>
-    <li>DBP (mmHg): 80</li>
-</ul>
-
-<h4>📝 Recommendations</h4>
-<div style='padding-left:20px'>
-    <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
-    <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
-    <p style='color:#dc3545;'>• Immediate surgical consultation</p>
-</div>
-
-
