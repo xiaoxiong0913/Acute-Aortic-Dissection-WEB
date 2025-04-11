@@ -41,18 +41,13 @@ st.write(f"Loaded features from the model: {features}")
 
 # 正确的特征顺序
 ordered_features = [
-    'CT-lesion involving ascending aorta', 'NEU', 'Age', 'CT-peritoneal effusion',
-    'AST', 'CREA', 'Escape beat', 'DBP', 'CT-intramural hematoma'
+    'CT-lesion involving ascending aorta', 'NEU', 'Age', 'CT-peritoneal effusion', 'AST', 
+    'CREA', 'Escape beat', 'DBP', 'CT-intramural hematoma'
 ]
 
 # 定义连续特征和分类特征
 continuous_features = ['NEU', 'Age', 'AST', 'CREA', 'DBP']
-categorical_features = [
-    'CT-lesion involving ascending aorta',
-    'CT-peritoneal effusion',
-    'Escape beat',
-    'CT-intramural hematoma'
-]
+categorical_features = ['CT-lesion involving ascending aorta', 'CT-peritoneal effusion', 'Escape beat', 'CT-intramural hematoma']
 
 # OneHotEncoder to transform categorical features (returns a sparse matrix by default)
 onehot_encoder = OneHotEncoder()
@@ -130,7 +125,7 @@ with col2:
             df = pd.DataFrame([input_data_all], columns=ordered_features)
 
             # 打印 DataFrame 的列名（用于调试）
-            st.write(f"Columns in the DataFrame: {df.columns.tolist()}")
+            st.write(f"Prediction data columns: {df.columns.tolist()}")
 
             # 标准化处理
             df_scaled = scaler.transform(df)
