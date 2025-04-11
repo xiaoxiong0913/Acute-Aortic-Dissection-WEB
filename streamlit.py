@@ -34,14 +34,7 @@ except Exception as e:
     st.error(f"加载模型、标准化器或特征时发生错误: {e}")
     st.stop()
 
-import streamlit as st
-import pandas as pd
-import pickle
-from sklearn.preprocessing import StandardScaler
-import warnings
-
-warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
-
+# 页面设置
 st.set_page_config(layout="wide", page_icon="❤️")
 st.title("Aortic Dissection Mortality Prediction System")
 
@@ -75,14 +68,14 @@ st.write("""
 </style>
 """, unsafe_allow_html=True)
 
-# Introduction section
+# 介绍部分
 st.write("# Introduction")
 st.write("""
 This clinical decision support tool integrates CT radiomics, electrocardiographic biomarkers, and laboratory parameters 
 to predict 3-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.05% accuracy**.
 """)
 
-# Clinical pathway cards
+# 临床路径卡片
 cols = st.columns(3)
 with cols[0]:
     st.write("""
@@ -136,7 +129,7 @@ with cols[2]:
     </div>
     """, unsafe_allow_html=True)
 
-# Load model resources
+# 载入模型资源
 try:
     model = pickle.load(open("gbm_model.pkl", "rb"))
     scaler = pickle.load(open("scaler.pkl", "rb"))
@@ -145,23 +138,23 @@ try:
         'AST', 'CREA', 'Escape beat', 'DBP', 'CT-intramural hematoma'
     ]
 except Exception as e:
-    st.error(f"Initialization failed: {str(e)}")
+    st.error(f"初始化失败: {str(e)}")
     st.stop()
 
-# Input panel
+# 输入面板
 with st.sidebar:
     st.write("## Patient Parameters")
     with st.form("input_form"):
         inputs = {}
         
-        # Continuous variables
+        # 连续变量
         inputs['Age'] = st.slider("Age (Years)", 18, 100, 50)
         inputs['NEU'] = st.slider("NEU (10⁹/L)", 0.1, 25.0, 5.0)
         inputs['AST'] = st.slider("AST (U/L)", 0, 500, 30)
         inputs['CREA'] = st.slider("CREA (μmol/L)", 30, 200, 80)
         inputs['DBP'] = st.slider("DBP (mmHg)", 40, 120, 80)
         
-        # Categorical variables
+        # 分类变量
         inputs['CT-lesion involving ascending aorta'] = st.selectbox("CT lesion involving ascending aorta", ["No", "Yes"])
         inputs['CT-peritoneal effusion'] = st.selectbox("CT peritoneal effusion", ["No", "Yes"])
         inputs['Escape beat'] = st.selectbox("Escape beat", ["No", "Yes"])
@@ -169,6 +162,45 @@ with st.sidebar:
         
         submitted = st.form_submit_button("Predict Risk")
 
+# 预测处理
+if submitted:
+    try:
+        # 数据预处理
+        input_data = {k: 1 if v == "Yes" else 0 if isinstance(v, str) else v for k, v in inputs.items()}
+        df = pd.DataFrame([input_data], columns=features)
+        df_scaled = scaler.transform(df)
+        prob = model.predict_proba(df_scaled)[:, 1][0]
+        risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
+        color = "#dc3545" if risk_status == "High Risk" else "#28a745"
+
+        # 显示结果
+        st.write(f"""
+        <div class='result-card'>
+            <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
+            <p>High risk of mortality within 3 years.</p>
+
+            <h4>📊 Parameter Assessment</h4>
+            <ul>
+                <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
+                    {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}</span></li>
+                <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>120 else "inherit"}'>
+                    {input_data['AST']} {"⚠️" if input_data['AST']>120 else ""}</span></li>
+                <li>DBP (mmHg): {input_data['DBP']}</li>
+            </ul>
+
+            <h4>📝 Recommendations</h4>
+            <div style='padding-left:20px'>
+                <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
+                <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
+                {"<p style='color:#dc3545;'>• Immediate surgical consultation</p>" if risk_status == "High Risk" else ""}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    except Exception as e:
+        st.error(f"Prediction error: {str(e)}")
+
+# 个性化建议
 st.markdown(
     "<span style='color:red'>This patient has a high probability of death within three years.</span>",
     unsafe_allow_html=True)
@@ -200,10 +232,6 @@ if condition_good:
     st.markdown(
         "<span style='color:green'>This patient has a high probability of survival after three years.</span>",
         unsafe_allow_html=True)
-
-        
-    except Exception as e:
-        st.error(f"Prediction error: {str(e)}")
 
 # Footer
 st.write("---")
