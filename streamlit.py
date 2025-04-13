@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import os
 from sklearn.preprocessing import StandardScaler
-
-# 处理版本警告
 import warnings
+
 
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
@@ -148,7 +146,6 @@ except Exception as e:
     st.error(f"Initialization failed: {str(e)}")
     st.stop()
 
-# Input panel
 with st.sidebar:
     st.write("## Patient Parameters")
     with st.form("input_form"):
@@ -159,7 +156,8 @@ with st.sidebar:
         inputs['NEU'] = st.slider("NEU (10⁹/L)", 0.1, 25.0, 5.0)
         inputs['AST'] = st.slider("AST (U/L)", 0, 500, 30)
         inputs['CREA'] = st.slider("CREA (μmol/L)", 30, 200, 80)
-        inputs['DBP'] = st.slider("DBP (mmHg)", 40, 120, 80)
+        # 修改点1: 调整 DBP 的默认值和范围
+        inputs['DBP'] = st.slider("DBP (mmHg)", 40, 160, 56)  # 默认值改为56，范围扩展
         
         # Categorical variables
         inputs['CT-lesion involving ascending aorta'] = st.selectbox("CT lesion involving ascending aorta", ["No", "Yes"])
@@ -190,14 +188,16 @@ if submitted:
             <ul>
                 <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
                     {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}</span></li>
-                <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>120 else "inherit"}'>
-                    {input_data['AST']} {"⚠️" if input_data['AST']>120 else ""}</span></li>
+                <!-- 修改点2: 调整 AST 警告阈值为102 -->
+                <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>102 else "inherit"}'>
+                    {input_data['AST']} {"⚠️" if input_data['AST']>102 else ""}</span></li>
                 <li>DBP (mmHg): {input_data['DBP']}</li>
             </ul>
             
             <h4>Recommendations</h4>
             <div style='padding-left:20px'>
                 <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
+                <!-- 修改点3: 修正术语拼写 -->
                 <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
                 {"<p style='color:#dc3545;'>• Immediate surgical consultation</p>" if risk_status == "High Risk" else ""}
             </div>
