@@ -180,27 +180,28 @@ if submitted:
 
         # Display results
         st.markdown(f"""
-        <div class='result-card'>
-            <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
-            <p>High risk of mortality within 1 year.</p>
-            
-            <h4>Parameter Assessment</h4>
-            <ul>  <!-- 修正1: 使用正确 ul 标签 -->
-                <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
-                    {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}</span></li>
-                <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>102 else "inherit"}'>
-                    {input_data['AST']} {"⚠️" if input_data['AST']>102 else ""}</span></li>
-                <li>DBP (mmHg): {input_data['DBP']}</li>
-            </ul>
-            
-            <h4>Recommendations</h4>
-            <div style='padding-left:20px'>
-                <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>  <!-- 修正2: 正确闭合标签 -->
-                <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
-                {"<p style='color:#dc3545;'>• Immediate surgical consultation</p>" if risk_status == "High Risk" else ""}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+<div class='result-card'>
+    <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
+    <p>High risk of mortality within 1 year.</p>
+    
+    <!-- 删除冗余的 <u> 和 <u1> 标签 -->
+    <h4>Parameter Assessment</h4>
+    <ul>
+        <li>CREA (μmol/L): <span style='color:{"#dc3545" if input_data["CREA"]>200 else "inherit"}'>
+            {input_data['CREA']} {"⚠️" if input_data['CREA']>200 else ""}</span></li>
+        <li>AST (U/L): <span style='color:{"#dc3545" if input_data["AST"]>102 else "inherit"}'>
+            {input_data['AST']} {"⚠️" if input_data["AST"]>102 else ""}</span></li>
+        <li>DBP (mmHg): {input_data['DBP']}</li>
+    </ul>
+    
+    <h4>Recommendations</h4>
+    <div style='padding-left:20px'>
+        <p style='color:#6c757d;'>• Regular cardiovascular follow-up</p>
+        <p style='color:#6c757d;'>• Optimize antihypertensive therapy</p>
+        {"<p style='color:#dc3545;'>• Immediate surgical consultation</p>" if risk_status == "High Risk" else ""}
+    </div>
+</div>
+""", unsafe_allow_html=True)
         
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
