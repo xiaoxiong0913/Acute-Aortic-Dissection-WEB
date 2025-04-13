@@ -179,12 +179,12 @@ if submitted:
         color = "#dc3545" if risk_status == "High Risk" else "#28a745"
 
         # Display results
-         st.markdown(f"""
+         st.markdown(f"""  # <- 确保此行与上一条语句对齐（仅1层缩进）
         <div class='result-card'>
             <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
             <p>High risk of mortality within 1 year.</p>
         </div>
-        """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)  # <- 括号对齐
         
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
