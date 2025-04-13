@@ -170,7 +170,7 @@ with st.sidebar:
 # Process prediction
 if submitted:
     try:
-        # Preprocess data
+        # 数据预处理
         input_data = {k: 1 if v == "Yes" else 0 if isinstance(v, str) else v for k, v in inputs.items()}
         df = pd.DataFrame([input_data], columns=features)
         df_scaled = scaler.transform(df)
@@ -178,18 +178,18 @@ if submitted:
         risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
         color = "#dc3545" if risk_status == "High Risk" else "#28a745"
 
-        # Display results
-         st.markdown(f"""  # <- 确保此行与上一条语句对齐（仅1层缩进）
+        # 显示结果（严格统一缩进）
+        st.markdown(f"""
         <div class='result-card'>
             <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
             <p>High risk of mortality within 1 year.</p>
         </div>
-        """, unsafe_allow_html=True)  # <- 括号对齐
+        """, unsafe_allow_html=True)  # 括号与 st.markdown 对齐
         
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
 
-# Footer
+# Footer（页脚部分不变）
 st.write("---")
 st.write("<div style='text-align: center; color: gray;'>Developed by Yichang Central People's Hospital</div>", 
          unsafe_allow_html=True)
