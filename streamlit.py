@@ -75,10 +75,10 @@ This clinical decision support tool integrates CT radiomics, electrocardiographi
 to predict 1-year mortality risk in aortic dissection patients. Validated with **AUC 0.89 (0.84-0.94)** and **88.05% accuracy**.
 """)
 
-# Clinical pathway cards (combined layout)
-cols = st.columns([2, 2, 2, 3])  # Adjusting columns to place monitoring in a separate section
+# Clinical pathway cards (adjusted layout)
+cols = st.columns([2, 3])  # First column for 3 smaller cards, second column for monitoring protocol
 
-# First three columns: High Risk Criteria, Laboratory Alerts, Surgical Indications
+# First column: High Risk Criteria, Laboratory Alerts, Surgical Indications
 with cols[0]:
     st.write("""
     <div class='protocol-card critical-card'>
@@ -87,10 +87,6 @@ with cols[0]:
             <li>Probability ≥20.2%</li>
         </ul>
     </div>
-    """, unsafe_allow_html=True)
-
-with cols[1]:
-    st.write("""
     <div class='protocol-card blue-card'>
         <h4 style='color:#17a2b8;'>Laboratory Alerts</h4>
         <ul style='padding-left:20px'>
@@ -98,10 +94,6 @@ with cols[1]:
             <li>AST >3×ULN → Hepatic workup</li>
         </ul>
     </div>
-    """, unsafe_allow_html=True)
-
-with cols[2]:
-    st.write("""
     <div class='protocol-card warning-card'>
         <h4 style='color:#ffc107;'>Surgical Indications</h4>
         <ul style='padding-left:20px'>
@@ -111,8 +103,8 @@ with cols[2]:
     </div>
     """, unsafe_allow_html=True)
 
-# Fourth column: Monitoring & Standard Protocol (in a separate section)
-with cols[3]:
+# Second column: Monitoring & Standard Protocol (in a separate section)
+with cols[1]:
     st.write("""
     <div class='protocol-card green-card'>
         <h4 style='color:#28a745;'>Monitoring & Standard Protocol</h4>
