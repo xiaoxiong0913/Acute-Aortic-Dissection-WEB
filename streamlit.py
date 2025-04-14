@@ -88,7 +88,7 @@ with cols[0]:
 # Second column: Laboratory Alerts and Surgical Indications
 with cols[1]:
     st.write("""
-    <div class='protocol-card green-card'>
+    <div class='protocol-card blue-card'>
         <h4 style='color:#28a745;'>Laboratory Alerts</h4>
         <ul style='padding-left:20px'>
             <li>Creatinine >200 μmol/L → Renal consult</li>
@@ -111,10 +111,10 @@ with cols[2]:
     <div class='protocol-card green-card'>
         <h4 style='color:#28a745;'>Monitoring & Standard Protocol</h4>
         <ul style='padding-left:20px'>
-            <li>CT follow-up every 72 hours (3 days)</li>
+             <li>Daily CT scans for the first 72 hours</li>
+            <li>CT follow-up every 72 hours</li>
             <li>Hourly monitoring of vital signs</li>
             <li>Neurological checks every 4 hours</li>
-            <li>Daily CT scans for the first 3 days (72 hours)</li>
             <li>Blood glucose monitoring every 6 hours</li>
             <li>Pulse oximetry monitoring continuously</li>
             <li>Urine output monitoring hourly</li>
