@@ -111,11 +111,18 @@ with cols[2]:
     <div class='protocol-card green-card'>
         <h4 style='color:#28a745;'>Monitoring & Standard Protocol</h4>
         <ul style='padding-left:20px'>
-            <li>CT follow-up every 3.0 days</li>
-            <li>Hourly vital signs</li>
-            <li>Neuro checks every 0.17 days</li>
-            <li>Daily CT ×3 days</li>
-            <li>Additional supportive care and monitoring based on individual patient condition</li>
+            <li>CT follow-up every 72 hours (3 days)</li>
+            <li>Hourly monitoring of vital signs</li>
+            <li>Neurological checks every 4 hours</li>
+            <li>Daily CT scans for the first 3 days (72 hours)</li>
+            <li>Blood glucose monitoring every 6 hours</li>
+            <li>Pulse oximetry monitoring continuously</li>
+            <li>Urine output monitoring hourly</li>
+            <li>Daily assessment of renal and liver function</li>
+            <li>Electrolyte levels checked every 12 hours</li>
+            <li>Coagulation profile assessment daily</li>
+            <li>Blood gas analysis as clinically indicated</li>
+            <li>Continuous cardiac telemetry monitoring</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
