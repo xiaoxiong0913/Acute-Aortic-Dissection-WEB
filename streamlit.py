@@ -4,15 +4,14 @@ import pickle
 from sklearn.preprocessing import StandardScaler
 import warnings
 
-
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
-# 加载模型、标准化器和特征列表
+# Load model, scaler, and feature list
 model_path = r"gbm_model.pkl"
 scaler_path = r"scaler.pkl"
 features_path = r"features.txt"
 
-# 使用 pickle 加载模型和标准化器
+# Load model and scaler using pickle
 try:
     with open(model_path, 'rb') as model_file:
         model = pickle.load(model_file)
@@ -20,16 +19,16 @@ try:
     with open(scaler_path, 'rb') as scaler_file:
         scaler = pickle.load(scaler_file)
 
-    # 检查 scaler 是否为 StandardScaler 实例
+    # Check if scaler is an instance of StandardScaler
     if not isinstance(scaler, StandardScaler):
-        raise ValueError("加载的 scaler 不是 StandardScaler 实例。")
+        raise ValueError("Loaded scaler is not an instance of StandardScaler.")
 
-    # 加载特征列表
+    # Load feature list
     with open(features_path, 'r') as f:
         features = f.read().splitlines()
 
 except Exception as e:
-    st.error(f"加载模型、标准化器或特征时发生错误: {e}")
+    st.error(f"Error loading model, scaler, or features: {e}")
     st.stop()
 
 import streamlit as st
@@ -41,9 +40,9 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 st.set_page_config(layout="wide", page_icon="❤️")
-st.title("Aortic Dissection Mortality Prediction System")
+st.title("Acute Aortic Dissection Mortality Prediction System")
 
-# Custom CSS styling
+# Custom CSS styling for beautification
 st.write("""
 <style>
 .protocol-card {
@@ -88,8 +87,6 @@ with cols[0]:
         <h4 style='color:#dc3545;'>High Risk Criteria</h4>
         <ul style='padding-left:20px'>
             <li>Probability ≥20.2%</li>
-            <li>Aortic lesion/hematoma</li>
-            <li>Requires ICU admission</li>
         </ul>
     </div>
     
@@ -111,25 +108,18 @@ with cols[1]:
             <li>Rapid hematoma expansion → Endovascular repair</li>
         </ul>
     </div>
-    
-    <div class='protocol-card green-card'>
-        <h4 style='color:#28a745;'>Standard Protocol</h4>
-        <ul style='padding-left:20px'>
-            <li>CT follow-up q72h</li>
-            <li>BP target: SBP <120 mmHg</li>
-            <li>Neuro checks q4h</li>
-        </ul>
-    </div>
     """, unsafe_allow_html=True)
 
 with cols[2]:
     st.write("""
     <div class='protocol-card green-card'>
-        <h4 style='color:#28a745;'>Monitoring Protocol</h4>
+        <h4 style='color:#28a745;'>Monitoring & Standard Protocol</h4>
         <ul style='padding-left:20px'>
+            <li>CT follow-up every 3.0 days</li>
             <li>Hourly vital signs</li>
-            <li>Neuro checks q4h</li>
+            <li>Neuro checks every 0.17 days</li>
             <li>Daily CT ×3 days</li>
+            <li>Additional supportive care and monitoring based on individual patient condition</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
@@ -156,8 +146,8 @@ with st.sidebar:
         inputs['NEU'] = st.slider("NEU (10⁹/L)", 0.1, 25.0, 5.0)
         inputs['AST'] = st.slider("AST (U/L)", 0, 500, 30)
         inputs['CREA'] = st.slider("CREA (μmol/L)", 30, 200, 80)
-        # 修改点1: 调整 DBP 的默认值和范围
-        inputs['DBP'] = st.slider("DBP (mmHg)", 40, 160, 56)  # 默认值改为56，范围扩展
+        # Adjusted DBP's default value and range
+        inputs['DBP'] = st.slider("DBP (mmHg)", 40, 160, 56)  # Default 56, range expanded
         
         # Categorical variables
         inputs['CT-lesion involving ascending aorta'] = st.selectbox("CT lesion involving ascending aorta", ["No", "Yes"])
@@ -170,7 +160,7 @@ with st.sidebar:
 # Process prediction
 if submitted:
     try:
-        # 数据预处理
+        # Data preprocessing
         input_data = {k: 1 if v == "Yes" else 0 if isinstance(v, str) else v for k, v in inputs.items()}
         df = pd.DataFrame([input_data], columns=features)
         df_scaled = scaler.transform(df)
@@ -178,18 +168,18 @@ if submitted:
         risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
         color = "#dc3545" if risk_status == "High Risk" else "#28a745"
 
-        # 显示结果（严格统一缩进）
+        # Display results
         st.markdown(f"""
         <div class='result-card'>
             <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
             <p>High risk of mortality within 1 year.</p>
         </div>
-        """, unsafe_allow_html=True)  # 括号与 st.markdown 对齐
+        """, unsafe_allow_html=True)
         
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
 
-# Footer（页脚部分不变）
+# Footer
 st.write("---")
 st.write("<div style='text-align: center; color: gray;'>Developed by Yichang Central People's Hospital</div>", 
          unsafe_allow_html=True)
