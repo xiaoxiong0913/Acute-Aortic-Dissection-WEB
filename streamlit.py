@@ -180,7 +180,16 @@ if submitted:
                 lower, upper = normal_ranges[var]
                 if value < lower or value > upper:
                     abnormal_vars.append(var)
-                    advice.append(f"<b>{var}</b>: <span style='color: red;'>Normal range: {lower}-{upper}</span>")
+                    # Add the advice message
+                    advice.append(f"<b>{var}:</b> Your value is {value}, while the normal range is {lower}-{upper}.")
+                    if var == 'NEU':
+                        advice.append("High NEU may indicate infection or inflammation. You should consider consulting a healthcare provider for further evaluation.")
+                    elif var == 'AST':
+                        advice.append("Elevated AST levels might indicate liver dysfunction. A liver function test is recommended to assess the underlying cause.")
+                    elif var == 'CREA':
+                        advice.append("High CREA levels could be a sign of kidney dysfunction. It is advisable to consult a nephrologist for proper evaluation and management.")
+                    elif var == 'DBP':
+                        advice.append("Elevated DBP (diastolic blood pressure) may indicate hypertension. Lifestyle modifications, including a balanced diet and regular exercise, may help lower blood pressure. Please consult your healthcare provider for further advice.")
 
         # Display results
         st.markdown(f"""
@@ -192,7 +201,8 @@ if submitted:
         
         # Display abnormal variables with advice
         if abnormal_vars:
-            st.markdown("<h4 style='color: red;'>Abnormal Variables:</h4>", unsafe_allow_html=True)
+            st.markdown("<h4 style='color: red;'>Personalized Advice:</h4>", unsafe_allow_html=True)
+            st.markdown("<p style='color: red;'>Below are the abnormal values and their corresponding advice for correction:</p>", unsafe_allow_html=True)
             for adv in advice:
                 st.markdown(f"<p>{adv}</p>", unsafe_allow_html=True)
 
