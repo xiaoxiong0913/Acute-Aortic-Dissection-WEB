@@ -31,14 +31,6 @@ except Exception as e:
     st.error(f"Error loading model, scaler, or features: {e}")
     st.stop()
 
-import streamlit as st
-import pandas as pd
-import pickle
-from sklearn.preprocessing import StandardScaler
-import warnings
-
-warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
-
 st.set_page_config(layout="wide", page_icon="❤️")
 st.title("Acute Aortic Dissection Mortality Prediction System")
 
@@ -81,6 +73,8 @@ to predict 1-year mortality risk in aortic dissection patients. Validated with *
 
 # Clinical pathway cards
 cols = st.columns(3)
+
+# First column: High Risk Criteria
 with cols[0]:
     st.write("""
     <div class='protocol-card critical-card'>
@@ -89,7 +83,11 @@ with cols[0]:
             <li>Probability ≥20.2%</li>
         </ul>
     </div>
-    
+    """, unsafe_allow_html=True)
+
+# Second column: Laboratory Alerts and Surgical Indications
+with cols[1]:
+    st.write("""
     <div class='protocol-card green-card'>
         <h4 style='color:#28a745;'>Laboratory Alerts</h4>
         <ul style='padding-left:20px'>
@@ -97,12 +95,9 @@ with cols[0]:
             <li>AST >3×ULN → Hepatic workup</li>
         </ul>
     </div>
-    """, unsafe_allow_html=True)
-
-with cols[1]:
-    st.write("""
+    
     <div class='protocol-card warning-card'>
-        <h4 style='color:#dc3545;'>Surgical Indications</h4>
+        <h4 style='color:#ffc107;'>Surgical Indications</h4>
         <ul style='padding-left:20px'>
             <li>Ascending aorta involvement → Emergency surgery</li>
             <li>Rapid hematoma expansion → Endovascular repair</li>
@@ -110,6 +105,7 @@ with cols[1]:
     </div>
     """, unsafe_allow_html=True)
 
+# Third column: Monitoring Protocol and Combined Protocol
 with cols[2]:
     st.write("""
     <div class='protocol-card green-card'>
@@ -123,6 +119,14 @@ with cols[2]:
         </ul>
     </div>
     """, unsafe_allow_html=True)
+
+# Define normal value ranges for continuous variables
+normal_ranges = {
+    'NEU': (1.8, 7.8),  # Normal range for NEU (10⁹/L)
+    'AST': (10, 40),    # Normal range for AST (U/L)
+    'CREA': (44, 106),  # Normal range for CREA (μmol/L)
+    'DBP': (60, 90),    # Normal range for DBP (mmHg)
+}
 
 # Load model resources
 try:
@@ -141,13 +145,12 @@ with st.sidebar:
     with st.form("input_form"):
         inputs = {}
         
-        # Continuous variables
+        # Continuous variables with normal ranges
         inputs['Age'] = st.slider("Age (Years)", 18, 100, 50)
         inputs['NEU'] = st.slider("NEU (10⁹/L)", 0.1, 25.0, 5.0)
         inputs['AST'] = st.slider("AST (U/L)", 0, 500, 30)
         inputs['CREA'] = st.slider("CREA (μmol/L)", 30, 200, 80)
-        # Adjusted DBP's default value and range
-        inputs['DBP'] = st.slider("DBP (mmHg)", 40, 160, 56)  # Default 56, range expanded
+        inputs['DBP'] = st.slider("DBP (mmHg)", 40, 160, 56)
         
         # Categorical variables
         inputs['CT-lesion involving ascending aorta'] = st.selectbox("CT lesion involving ascending aorta", ["No", "Yes"])
@@ -167,6 +170,17 @@ if submitted:
         prob = model.predict_proba(df_scaled)[:, 1][0]
         risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
         color = "#dc3545" if risk_status == "High Risk" else "#28a745"
+        
+        # Check for abnormal values and highlight them
+        abnormal_vars = []
+        advice = []
+
+        for var, value in inputs.items():
+            if var in normal_ranges:
+                lower, upper = normal_ranges[var]
+                if value < lower or value > upper:
+                    abnormal_vars.append(var)
+                    advice.append(f"<b>{var}</b>: <span style='color: red;'>Normal range: {lower}-{upper}</span>")
 
         # Display results
         st.markdown(f"""
@@ -176,6 +190,12 @@ if submitted:
         </div>
         """, unsafe_allow_html=True)
         
+        # Display abnormal variables with advice
+        if abnormal_vars:
+            st.markdown("<h4 style='color: red;'>Abnormal Variables:</h4>", unsafe_allow_html=True)
+            for adv in advice:
+                st.markdown(f"<p>{adv}</p>", unsafe_allow_html=True)
+
     except Exception as e:
         st.error(f"Prediction error: {str(e)}")
 
