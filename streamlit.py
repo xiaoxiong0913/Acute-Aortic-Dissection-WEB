@@ -192,13 +192,22 @@ if submitted:
                 if value < lower or value > upper:
                     abnormal_vars.append(var)
                     # Add the advice message
-                    advice.append(f"<b>{var}:</b> Your value is {value}, while the normal range is {lower}-{upper}.")
+                    advice.append(f"<b>{var} ({'μmol/L' if var == 'CREA' else 'U/L' if var == 'AST' else 'mmHg' if var == 'DBP' else '10⁹/L'})</b>: Your value is {value}, while the normal range is {lower}-{upper}.")
                     if var == 'NEU':
-                        advice.append("High NEU may indicate infection or inflammation. You should consider consulting a healthcare provider for further evaluation.")
+                        if value < lower:
+                            advice.append("Low NEU could indicate bone marrow suppression or other conditions. A hematology consult is recommended.")
+                        else:
+                            advice.append("High NEU may indicate infection or inflammation. You should consider consulting a healthcare provider for further evaluation.")
                     elif var == 'AST':
-                        advice.append("Elevated AST levels might indicate liver dysfunction. A liver function test is recommended to assess the underlying cause.")
+                        if value < lower:
+                            advice.append("Low AST levels are rarely a concern, but they might indicate a deficiency or chronic liver disease. Consult a healthcare provider if needed.")
+                        else:
+                            advice.append("Elevated AST levels might indicate liver dysfunction. A liver function test is recommended to assess the underlying cause.")
                     elif var == 'CREA':
-                        advice.append("High CREA levels could be a sign of kidney dysfunction. It is advisable to consult a nephrologist for proper evaluation and management.")
+                        if value < lower:
+                            advice.append("Low CREA levels might indicate malnutrition or muscle wasting. It is advisable to consult a healthcare provider.")
+                        else:
+                            advice.append("High CREA levels could be a sign of kidney dysfunction. It is advisable to consult a nephrologist for proper evaluation and management.")
                     elif var == 'DBP':
                         if value < lower:
                             advice.append("Low DBP (diastolic blood pressure) can be a sign of poor perfusion. Increasing fluid intake or medication adjustments may be necessary.")
