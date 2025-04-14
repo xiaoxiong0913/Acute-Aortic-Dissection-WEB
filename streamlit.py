@@ -55,6 +55,10 @@ st.write("""
     border-left: 5px solid #28a745;
     background-color: #f0fff4;
 }
+.blue-card {
+    border-left: 5px solid #17a2b8;
+    background-color: #d1ecf1;
+}
 .result-card {
     border-radius: 10px;
     padding: 20px;
@@ -89,7 +93,7 @@ with cols[0]:
 with cols[1]:
     st.write("""
     <div class='protocol-card blue-card'>
-        <h4 style='color:#28a745;'>Laboratory Alerts</h4>
+        <h4 style='color:#17a2b8;'>Laboratory Alerts</h4>
         <ul style='padding-left:20px'>
             <li>Creatinine >200 μmol/L → Renal consult</li>
             <li>AST >3×ULN → Hepatic workup</li>
@@ -196,7 +200,10 @@ if submitted:
                     elif var == 'CREA':
                         advice.append("High CREA levels could be a sign of kidney dysfunction. It is advisable to consult a nephrologist for proper evaluation and management.")
                     elif var == 'DBP':
-                        advice.append("Elevated DBP (diastolic blood pressure) may indicate hypertension. Lifestyle modifications, including a balanced diet and regular exercise, may help lower blood pressure. Please consult your healthcare provider for further advice.")
+                        if value < lower:
+                            advice.append("Low DBP (diastolic blood pressure) can be a sign of poor perfusion. Increasing fluid intake or medication adjustments may be necessary.")
+                        else:
+                            advice.append("Elevated DBP (diastolic blood pressure) may indicate hypertension. Lifestyle modifications, including a balanced diet and regular exercise, may help lower blood pressure. Please consult your healthcare provider for further advice.")
 
         # Display results
         st.markdown(f"""
