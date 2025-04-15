@@ -176,6 +176,9 @@ if submitted:
         risk_status = "High Risk" if prob >= 0.202 else "Low Risk"
         color = "#dc3545" if risk_status == "High Risk" else "#28a745"
         
+        # 关键修改点：动态风险提示
+        risk_message = "High risk of mortality within 1 year." if risk_status == "High Risk" else "Low risk of mortality within 1 year."
+        
         # Check for abnormal values and highlight them
         abnormal_vars = []
         advice = []
@@ -212,7 +215,7 @@ if submitted:
         st.markdown(f"""
         <div class='result-card'>
             <h2 style='color:{color};'>Predicted Mortality Risk: {prob*100:.1f}% ({risk_status})</h2>
-            <p>High risk of mortality within 1 year.</p>
+            <p>{risk_message}</p>  <!-- 修改后的动态提示 -->
         </div>
         """, unsafe_allow_html=True)
         
