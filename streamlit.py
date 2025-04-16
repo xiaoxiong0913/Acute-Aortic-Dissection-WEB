@@ -32,7 +32,7 @@ except Exception as e:
     st.stop()
 
 st.set_page_config(layout="wide", page_icon="❤️")
-st.title("Acute Aortic Dissection Mortality Prediction System")
+st.title("Aortic Dissection Mortality Prediction System")
 
 # Custom CSS styling for beautification
 st.write("""
